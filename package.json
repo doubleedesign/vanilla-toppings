@@ -1,0 +1,33 @@
+{
+	"name": "@doubleedesign/vanilla-toppings",
+	"version": "0.0.1",
+	"description": "Sprinklings of interactivity for existing interfaces.",
+	"author": "Leesa Ward <contact@doubleedesign.com.au>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/doubleedesign/vanilla-toppings"
+	},
+	"license": "ISC",
+	"type": "module",
+	"scripts": {
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build"
+	},
+	"devDependencies": {
+		"@chromatic-com/storybook": "^5.1.1",
+		"@storybook/addon-a11y": "^10.3.5",
+		"@storybook/addon-docs": "^10.3.5",
+		"@storybook/addon-vitest": "^10.3.5",
+		"@storybook/html-vite": "^10.3.5",
+		"@stylistic/eslint-plugin-ts": "^4.4.1",
+		"@typescript-eslint/eslint-plugin": "^8.58.1",
+		"@typescript-eslint/parser": "^8.58.1",
+		"@vitest/browser-playwright": "^4.1.3",
+		"@vitest/coverage-v8": "^4.1.3",
+		"globals": "^17.4.0",
+		"playwright": "^1.59.1",
+		"storybook": "^10.3.5",
+		"typescript": "^6.0.2",
+		"vitest": "^4.1.3"
+	}
+}
