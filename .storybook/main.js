@@ -1,17 +1,15 @@
-
-
 /** @type { import('@storybook/html-vite').StorybookConfig } */
 const config = {
-  "stories": [
-    "../stories/**/*.mdx",
-    "../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)"
-  ],
-  "addons": [
-    "@chromatic-com/storybook",
-    "@storybook/addon-vitest",
-    "@storybook/addon-a11y",
-    "@storybook/addon-docs"
-  ],
-  "framework": "@storybook/html-vite"
+	'stories': [
+		'../**/*.mdx',
+		'../**/*.stories.@(js|jsx|mjs|ts|tsx)'
+	],
+	'addons': [
+		'@storybook/addon-docs',
+		'@storybook/addon-a11y',
+		'@whitespace/storybook-addon-html',
+		'@storybook/addon-vitest',
+	],
+	'framework': '@storybook/html-vite'
 };
 export default config;

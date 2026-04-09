@@ -1,5 +1,5 @@
 {
-	"name": "@doubleedesign/vanilla-drag-handle",
+	"name": "@doubleedesign/vanilla-resize-handle",
 	"version": "0.0.1",
 	"description": "",
 	"main": "dist/index.js",

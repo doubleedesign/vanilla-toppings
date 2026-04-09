@@ -1,0 +1,114 @@
+$element: '.vt-resizable';
+
+#{$element} {
+	position: relative;
+
+	&--left,
+	&--right {
+		overflow-x: visible;
+		overflow-y: clip;
+	}
+
+	&--top,
+	&--bottom {
+		overflow-x: clip;
+		overflow-y: visible;
+	}
+
+	&__drag-handle {
+		box-sizing: border-box;
+		background-color: var(--vt-resize-handle-color, AccentColor);
+		background-clip: padding-box;
+		padding: 0;
+		cursor: grab;
+		position: absolute;
+		z-index: 20;
+		opacity: 0;
+		transition: opacity 0.3s ease;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+
+		&:hover, &:focus {
+			opacity: 1;
+			outline: none;
+		}
+
+		&:active {
+			cursor: grabbing;
+		}
+
+		&__icon {
+			width: 2rem;
+			height: 2rem;
+			font-style: normal;
+			text-align: center;
+			display: flex;
+			flex-wrap: nowrap;
+			justify-content: center;
+			align-items: center;
+			align-content: center;
+			transform: translateX(-0.85rem);
+			color: var(--vt-resize-handle-color, AccentColor);
+
+			svg {
+				width: 2rem;
+				height: 2rem;
+			}
+		}
+
+		@at-root {
+			#{$element}--left &,
+			#{$element}--right & {
+				width: calc((0.875rem * 2) + 0.25rem);
+				border-block: 0;
+				border-inline: 0.875rem solid transparent;
+				top: 0;
+				bottom: 0;
+			}
+
+			#{$element}--left &,
+			#{$element}--right & {
+				width: calc((0.875rem * 2) + 0.25rem);
+				border-block: 0;
+				border-inline: 0.875rem solid transparent;
+				top: 0;
+				bottom: 0;
+			}
+
+			#{$element}--top &,
+			#{$element}--bottom & {
+				height: calc((0.875rem * 2) + 0.25rem);
+				border-block: 0.875rem solid transparent;
+				border-inline: 0;
+				left: 0;
+				right: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			#{$element}--left & {
+				left: 0;
+				transform: translateX(-0.875rem);
+			}
+
+			#{$element}--right & {
+				right: 0;
+				transform: translateX(0.875rem);
+			}
+
+			#{$element}--top & {
+				top: 0;
+				transform: translateY(-0.875rem);
+			}
+
+			#{$element}--bottom & {
+				bottom: 0;
+				transform: translateY(0.875rem);
+			}
+
+		}
+	}
+}

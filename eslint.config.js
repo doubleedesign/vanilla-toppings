@@ -6,7 +6,7 @@ import globals from 'globals';
 
 export default [
 	{
-		files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.test/ts', '**/*.spec.ts', '**/*.mts'],
+		files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx', '**/*.test.ts', '**/*.spec.ts', '**/*.stories.ts', '**/*.mts'],
 		ignores: ['dist', 'node_modules/**'],
 		languageOptions: {
 			ecmaVersion: 2020,
