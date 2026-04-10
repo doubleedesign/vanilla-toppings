@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;600;700&display=swap');
+
+.docblock-source,
+[id*="tabpanel-storybook/html/panel"] {
+	background: #181825 !important;
+
+	.prismjs {
+		color: white;
+
+		* {
+			font-family: 'Fira Code', monospace !important;
+			font-weight: 300;
+			font-size: 0.9rem;
+			line-height: 1.4;
+		}
+
+		/** Based on Catpuccin Mocha - https://prismjs.catppuccin.com/mocha.css */
+	    code[class*="language-"],
+	    pre[class*="language-"] {
+	        color: #cdd6f4;
+	    }
+
+	    :not(pre) > code[class*="language-"],
+	    pre[class*="language-"] {
+	        background: #181825;
+	    }
+
+	    /* https://prismjs.com/tokens.html */
+
+	    .token.keyword {
+	        color: #cba6f7;
+	    }
+
+	    .token.builtin {
+	        color: #f38ba8;
+	    }
+
+		.token.maybe-class-name,
+	    .token.class-name {
+	        color: #f9e2af;
+	    }
+
+	    .token.function {
+	        color: #89b4fa;
+	    }
+
+	    .token.boolean,
+	    .token.number {
+	        color: #fab387;
+	    }
+
+	    .token.string,
+	    .token.char {
+	        color: #a6e3a1;
+	    }
+
+	    .token.symbol {
+	        color: #f9e2af;
+	    }
+
+	    .token.regex {
+	        color: #f5c2e7;
+	    }
+
+	    .token.url {
+	        color: #a6e3a1;
+	    }
+
+	    .token.operator {
+	        color: #89dceb;
+	    }
+
+	    .token.variable {
+	        color: #cdd6f4;
+	    }
+
+		.token.dom.variable,
+	    .token.constant {
+	        color: #fab387;
+	    }
+
+	    .token.property {
+	        color: #89b4fa;
+	    }
+
+	    .token.punctuation {
+	        color: #9399b2;
+	    }
+
+	    .token.important {
+	        color: #cba6f7;
+	    }
+
+	    .token.comment {
+	        color: #9399b2;
+	    }
+
+	    .token.tag {
+	        color: #89b4fa;
+	    }
+
+	    .token.attr-name {
+	        color: #f9e2af;
+	    }
+
+	    .token.attr-value {
+	        color: #a6e3a1;
+	    }
+
+	    .token.namespace {
+	        color: #f9e2af;
+	    }
+
+	    .token.prolog,
+	    .token.doctype {
+	        color: #cba6f7;
+	    }
+
+	    .token.cdata {
+	        color: #94e2d5;
+	    }
+
+	    .token.entity {
+	        color: #f38ba8;
+	    }
+
+	    .token.atrule {
+	        color: #cba6f7;
+	    }
+
+	    .token.selector {
+	        color: #89b4fa;
+	    }
+
+	    /* Diff */
+
+	    .token.deleted {
+	        color: #f38ba8;
+	    }
+
+	    .token.inserted {
+	        color: #a6e3a1
+	    }
+
+	    /* Other */
+
+	    .token.important,
+	    .token.bold {
+	        font-weight: bold;
+	    }
+
+	    .token.italic {
+	        font-style: italic;
+	    }
+	}
+}

@@ -58,6 +58,16 @@ const meta: Meta = {
 	parameters: {
 		docs: {
 			subtitle: 'A simple utility to add a resize handle to any element on a given side.',
+			source: {
+				type: 'code',
+				language: 'javascript',
+				code: `
+					import { ResizeHandle } from '@doubleedesign/vanilla-resize-handle';
+					
+					const element = document.querySelector('#my-element');
+					new ResizeHandle({ element: element, position: '${ResizeHandlePosition.RIGHT}' });
+				`,
+			},
 		},
 	}
 };

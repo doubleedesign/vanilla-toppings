@@ -1,6 +1,6 @@
 import { spyOn } from 'storybook/test';
 import './preview.css';
-import { Title, Subtitle, Description, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import { Title, Subtitle, Description, Primary, Controls, Stories, Source } from '@storybook/addon-docs/blocks';
 
 /** @type { import('@storybook/html-vite').Preview } */
 const preview = {
@@ -22,6 +22,7 @@ const preview = {
 					<Subtitle />
 					<Description />
 					<Primary />
+					<Source />
 					<Controls />
 					<Stories includePrimary={false}/>
 				</>

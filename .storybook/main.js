@@ -1,5 +1,3 @@
-import { relative, join } from 'path';
-
 /** @type { import('@storybook/html-vite').StorybookConfig } */
 const config = {
 	stories: (async () => {
@@ -21,6 +19,7 @@ const config = {
 		'@storybook/addon-vitest',
 	],
 	framework: '@storybook/html-vite',
+	staticDirs: ['../sb-assets']
 };
 
 export default config;
