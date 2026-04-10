@@ -41,10 +41,6 @@ export default [
 				'MemberExpression': 1,
 				'offsetTernaryExpressions': true
 			}],
-			'@stylistic/quotes': [
-				'error',
-				'single'
-			],
 			'@stylistic/space-in-parens': 'off',
 			'@stylistic/array-bracket-spacing': 'off',
 			'@stylistic/object-curly-spacing': [

@@ -12,7 +12,18 @@ export default defineConfig({
 	test: {
 		projects: [
 			{
-				extends: true, 
+				test: {
+					name: 'unit',
+					include: ['**/*.test.ts'],
+					// at the time of writing, happy-dom supports document.adoptedStyleSheets (used in the demo web component) whereas jsdom does not
+					environment: 'happy-dom',
+					setupFiles: ['./vitest.setup.ts'],
+					globals: true,
+					css: true,
+				},
+			},
+			{
+				extends: true,
 				plugins: [
 					// The plugin will run tests for the stories defined in your Storybook config
 					// See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
@@ -20,6 +31,7 @@ export default defineConfig({
 				],
 				test: {
 					name: 'storybook',
+					include: ['**/*.stories.ts'],
 					browser: {
 						enabled: true,
 						headless: true,

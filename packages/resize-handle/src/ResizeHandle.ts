@@ -1,4 +1,4 @@
-import { ResizeHandleProps, ResizeHandlePosition } from './types';
+import { ResizeHandlePosition, ResizeHandleProps } from './types';
 
 export class ResizeHandle {
 	private element: HTMLElement;
@@ -7,14 +7,16 @@ export class ResizeHandle {
 	private readonly ariaLabel: string;
 	private readonly tooltip: string;
 	private readonly position: ResizeHandlePosition;
+	private handlePosition: { x: number; y: number } = { x: 0, y: 0 };
 
 	constructor({ element, container, position, className, ariaLabel, tooltip }: ResizeHandleProps) {
 		this.element = element;
 		this.container = (container instanceof HTMLElement) ? container : (element.parentElement ?? document.body);
 		this.classes = ['vt-resizable', className].filter(cls => cls !== undefined);
 		this.ariaLabel = ariaLabel ?? 'Resize';
-		this.tooltip = tooltip ?? 'Resize';
+		this.tooltip = tooltip ?? ariaLabel ?? 'Resize';
 		this.position = position;
+		this.handlePosition = { x: 0, y: 0 };
 
 		this.maybeAddClasses();
 		this.maybeAddResizeHandle();
@@ -68,12 +70,8 @@ export class ResizeHandle {
 			this.element.appendChild(dragHandle);
 		}
 
+		dragHandle.addEventListener('dragstart', this.onDragStart.bind(this));
 		dragHandle.addEventListener('dragend', this.onDragEnd.bind(this));
-
-		// FIXME: This somehow breaks the calculations
-		// this?.container?.addEventListener('dragover', (event) => {
-		// 	event.preventDefault(); // Prevent the cursor being the "not allowed" one while dragging
-		// });
 	}
 
 	canResize() {
@@ -113,23 +111,51 @@ export class ResizeHandle {
 		return diff > 32; // more space than the height of the handle
 	}
 
-	onDragEnd(event: DragEvent) {
-		// TODO: This needs to account for the element not being on the furthest edge of its container, e.g., centered example
+	onContainerDragOver(event: DragEvent) {
+		event.preventDefault(); // Prevent the cursor being the "not allowed" one while dragging
+	}
 
-		switch(this.position) {
-			case 'right':
-				this.element.style.setProperty('width', `${event.pageX - this.element.getBoundingClientRect().left}px`, 'important');
-				break;
-			case 'left':
-				this.element.style.setProperty('width', `${this.element.getBoundingClientRect().right - event.pageX}px`, 'important');
-				break;
-			case 'bottom':
-				this.element.style.setProperty('height', `${event.pageY - this.element.getBoundingClientRect().top}px`, 'important');
-				break;
-			case 'top':
-				this.element.style.setProperty('height', `${this.element.getBoundingClientRect().bottom - event.pageY}px`, 'important');
-				break;
-		}
+	onDragStart(event: DragEvent) {
+		this?.container?.addEventListener('dragover', this.onContainerDragOver.bind(this));
+
+		// Save the handle position when the drag starts so we can use it to calculate the position change
+		this.handlePosition = this.getHandlePosition(event);
+	}
+
+	onDragEnd(event: DragEvent) {
+		this?.container?.removeEventListener('dragover', this.onContainerDragOver.bind(this));
+
+		const oldHandlePosition = this.handlePosition;
+		const newHandlePosition = this.getHandlePosition(event);
+
+		// TODO: This needs to account for the element not being on the furthest edge of its container, e.g., centered example
+		// switch(this.position) {
+		// 	case 'right':
+		// 		this.element.style.setProperty('width', `${event.pageX - this.element.getBoundingClientRect().left}px`, 'important');
+		// 		break;
+		// 	case 'left':
+		// 		this.element.style.setProperty('width', `${this.element.getBoundingClientRect().right - event.pageX}px`, 'important');
+		// 		break;
+		// 	case 'bottom':
+		// 		this.element.style.setProperty('height', `${event.pageY - this.element.getBoundingClientRect().top}px`, 'important');
+		// 		break;
+		// 	case 'top':
+		// 		this.element.style.setProperty('height', `${this.element.getBoundingClientRect().bottom - event.pageY}px`, 'important');
+		// 		break;
+		// }
+	}
+
+	getHandlePosition(event: DragEvent) {
+		console.log(this.container!.getBoundingClientRect());
+		console.log(event);
+		//  TODO: Get the X and Y coordinates of the drop position relative to the container, where the top-left corner of the container is (0, 0)
+		const offsetX = 1;
+		const offsetY = 1;
+
+		return {
+			x: offsetX,
+			y: offsetY,
+		};
 	}
 
 	// TODO: Keyboard interaction

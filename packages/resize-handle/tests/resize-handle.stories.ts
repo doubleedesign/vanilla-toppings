@@ -2,8 +2,8 @@ import { Meta, StoryObj } from '@storybook/html-vite';
 import { ResizeHandlePosition, ResizeHandleProps } from '../src/types';
 import './ResizeHandleDemo';
 import { withResizeHandle } from './with-resize-handle';
-import { userEvent, expect, waitFor } from 'storybook/test';
-import { within, fireEvent } from '@storybook/test';
+import { expect, waitFor } from 'storybook/test';
+import { within } from '@storybook/test';
 // @ts-expect-error TS2882: Cannot find module or type declarations for side-effect import of ./drag-handle.css
 import '../src/resize-handle.css';
 
@@ -11,25 +11,24 @@ const meta: Meta = {
 	title: 'Vanilla Toppings/ResizeHandle',
 	tags: ['autodocs'],
 	args: {
-		element: '',
-		position: 'right',
-		container: '',
+		position: ResizeHandlePosition.RIGHT,
 		className: '',
 		ariaLabel: 'Resize',
 		tooltip: 'Resize',
 	},
 	argTypes: {
+		position: {
+			control: { type: 'select' },
+			// @ts-expect-error TS2322: Type "ResizeHandlePosition" is not assignable to type
+			type: { name: 'ResizeHandlePosition', required: true },
+			options: [ResizeHandlePosition.RIGHT, ResizeHandlePosition.LEFT, ResizeHandlePosition.TOP, ResizeHandlePosition.BOTTOM],
+			description: 'Which side of the element the resize handle should be attached to.',
+		},
 		element: {
 			control: { disable: true },
 			// @ts-expect-error TS2322: Type "HTMLElement" is not assignable to type
 			type: { name: 'HTMLElement', required: true },
 			description: 'The DOM element to attach the resize handle to.',
-		},
-		position: {
-			control: { type: 'select' },
-			// @ts-expect-error TS2322: Type "ResizeHandlePosition" is not assignable to type
-			type: { name: 'ResizeHandlePosition', required: true },
-			options: ['left', 'right', 'top', 'bottom'],
 		},
 		container: {
 			control: { disable: true },
@@ -64,7 +63,8 @@ const meta: Meta = {
 };
 export default meta;
 
-type Story = StoryObj<ResizeHandleProps>;
+export type ResizeHandleStoryProps = Omit<ResizeHandleProps, 'element'>;
+type Story = StoryObj<ResizeHandleStoryProps>;
 
 
 export const Basic: Story = {
@@ -134,37 +134,83 @@ export const CustomContainer: Story = {
 		const example = document.createElement('resize-handle-demo');
 		example.setAttribute('data-example-variant', 'contained');
 
-		// Create an extra container
+		// Create custom containers
 		const container = document.createElement('div');
 		container.classList.add('vt-resize-handle-demo-custom-container');
 		container.style.border = '2px dotted blue';
 		container.style.width = '700px';
-		container.style.height = '500px';
+		container.style.height = '550px';
 		container.style.display = 'flex';
 
+		const inner = document.createElement('div');
+		inner.classList.add('vt-resize-handle-demo-custom-container__inner');
+		inner.style.border = '2px dotted #999';
+		inner.style.width = '600px';
+		inner.style.height = '500px';
+		inner.style.display = 'flex';
+
+		container.appendChild(inner);
+
 		// Align the demo element inside it so that the handle will be on the opposite side
-		if(args.position === 'left') {
-			container.style.justifyContent = 'flex-end';
+		if(args.position === ResizeHandlePosition.LEFT) {
+			inner.style.justifyContent = 'flex-end';
 		}
-		if(args.position === 'top') {
-			container.style.alignItems = 'flex-end';
+		if(args.position === ResizeHandlePosition.TOP) {
+			inner.style.alignItems = 'flex-end';
 		}
 
-		// Move the demo element inside the new container
+		// Move the demo element inside the inner container
 		setTimeout(() => {
 			const demoElement = example.querySelector('[data-testid="vt-demo-element"]') as HTMLElement;
-			container.appendChild(demoElement);
+			inner.appendChild(demoElement);
 			example.appendChild(container);
 		}, 50);
 
 		return example;
 	},
 	decorators: [
+		// Constrain to the outer container so we can test that it ignores the inner container
 		withResizeHandle({ container: document.querySelector('.vt-resize-handle-demo-custom-container') as HTMLElement })
 	],
 };
 
-export const CustomClassNameAndStyling: Story = {
+export const ElementHasMinSize: Story = {
+	tags: ['!autodocs'],
+	decorators: [
+		withResizeHandle({ className: 'my-resizable-thing' }),
+		(story, { args }) => {
+			const example = story() as HTMLElement;
+
+			// Ensure element is positioned to the opposite side to its handle position, so that the handle will show
+			if(args.position === ResizeHandlePosition.LEFT) {
+				example.style.justifyContent = 'flex-end';
+			}
+			if(args.position === ResizeHandlePosition.TOP) {
+				example.style.alignItems = 'flex-end';
+			}
+
+			return example;
+		}
+	],
+	render: (args: Partial<ResizeHandleProps>) => {
+		const example = document.createElement('resize-handle-demo');
+		example.classList.add('my-resizable-thing');
+
+		// Hack in the CSS here so that it shows in the HTML addon tab
+		const style = document.createElement('style');
+		style.textContent = `
+			.my-resizable-thing { 
+				min-width: 200px;
+				min-height: 200px;
+			}
+		`;
+		example.appendChild(style);
+
+		return example;
+	},
+};
+
+export const CustomHandleStyling: Story = {
 	tags: ['!autodocs'],
 	args: {
 		className: 'my-resizable-thing',
@@ -191,9 +237,7 @@ export const CustomClassNameAndStyling: Story = {
 		return example;
 	},
 	decorators: [
-		withResizeHandle({
-			className: 'my-resizable-thing'
-		}),
+		withResizeHandle({ className: 'my-resizable-thing' }),
 	],
 	parameters: {
 		controls: {
@@ -205,7 +249,7 @@ export const CustomClassNameAndStyling: Story = {
 export const NoHandleWhenNowhereToGo: Story = {
 	tags: ['!autodocs'],
 	args: {
-		position: 'left',
+		position: ResizeHandlePosition.LEFT,
 	},
 	decorators: [
 		withResizeHandle({})

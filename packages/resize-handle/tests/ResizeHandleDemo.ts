@@ -37,7 +37,7 @@ const styles = `
 		justify-content: center;
 		align-items: center;
 	}
-	
+
 	resize-handle-demo[data-example-variant="contained"] {
 		border: 2px dotted #333;
 		width: 900px;
@@ -45,7 +45,7 @@ const styles = `
 		max-height: 600px;
 		margin: 0 auto;
 	}
-	
+
 	[data-testid="vt-demo-element"] {
 		background-color: #eee;
 		width: 30%;
