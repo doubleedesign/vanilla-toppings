@@ -78,13 +78,13 @@ export class ResizeHandle {
 
 	canResize() {
 		switch(this.position) {
-			case 'right':
+			case ResizeHandlePosition.RIGHT:
 				return this.canGoRight();
-			case 'left':
+			case ResizeHandlePosition.LEFT:
 				return this.canGoLeft();
-			case 'bottom':
+			case ResizeHandlePosition.BOTTOM:
 				return this.canGoDown();
-			case 'top':
+			case ResizeHandlePosition.TOP:
 				return this.canGoUp();
 		}
 	}
