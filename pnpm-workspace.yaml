@@ -1,2 +1,2 @@
 packages:
-  - drag-handle
+  - packages/*

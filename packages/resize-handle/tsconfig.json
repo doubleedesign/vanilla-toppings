@@ -1,7 +1,7 @@
 {
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
-		"baseUrl": ".",
+		"rootDir": "src",
 		"outDir": "dist",
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
@@ -15,6 +15,7 @@
 		"**/*.test.ts",
 		"**/*.spec.ts",
 		"**/*.stories.ts",
-		"**/*.Demo.ts"
+		"**/*.Demo.ts",
+		"vitest.setup.ts"
 	]
 }

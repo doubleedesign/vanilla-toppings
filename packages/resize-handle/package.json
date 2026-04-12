@@ -1,17 +1,29 @@
 {
 	"name": "@doubleedesign/vanilla-resize-handle",
-	"version": "0.0.1",
-	"description": "",
-	"main": "dist/index.js",
-	"scripts": {
-		"build": "tsc",
-		"test": "echo \"Error: no test specified\" && exit 1"
-	},
 	"author": "Leesa Ward <contact@doubleedesign.com.au>",
+	"version": "0.0.1",
+	"type": "module",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/doubleedesign/vanilla-toppings"
 	},
+	"description": "A vanilla JavaScript resize handle plugin.",
+	"scripts": {
+		"build": "tsc && cp src/resize-handle.css dist",
+		"release": "npm run build && npx auto shipit"
+	},
+	"packageManager": "pnpm@10.22.0+sha512.bf049efe995b28f527fd2b41ae0474ce29186f7edcb3bf545087bd61fbbebb2bf75362d1307fda09c2d288e1e499787ac12d4fcb617a974718a6051f2eee741c",
+	"exports": {
+		".": "./dist/ResizeHandle.js"
+	},
 	"license": "ISC",
-	"type": "module"
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"dist",
+		"README.md",
+		"NOTICES.md",
+		"package.json"
+	]
 }

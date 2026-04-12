@@ -32,12 +32,6 @@ const meta: Meta = {
 			type: { name: 'HTMLElement', required: true },
 			description: 'The DOM element to attach the resize handle to.',
 		},
-		container: {
-			control: { disable: true },
-			// @ts-expect-error TS2322: Type "HTMLElement" is not assignable to type
-			type: { name: 'HTMLElement', required: false },
-			description: 'The DOM element to constrain the resizing within (defaults to the parent of the element).',
-		},
 		className: {
 			control: { type: 'text' },
 			description: 'Optional custom class name/BEM prefix to apply to the elements; should generally match a class name that is already on the element.',
@@ -65,6 +59,7 @@ const meta: Meta = {
 				language: 'javascript',
 				code: `
 					import { ResizeHandle } from '@doubleedesign/vanilla-resize-handle';
+					// Note: You will also need to import the CSS via a platform-appropriate method
 					
 					const element = document.querySelector('#my-element');
 					new ResizeHandle({ element: element, position: '${ResizeHandlePosition.RIGHT}' });
