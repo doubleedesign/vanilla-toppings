@@ -1,22 +1,35 @@
 import { ResizeHandlePosition, ResizeHandleProps } from './types';
+import { ContextHandler } from './ContextHandler';
+import { getOppositeSide } from './utils';
+
+type HandleLocation = {
+	x: number;
+	y: number;
+};
 
 export class ResizeHandle {
-	private element: HTMLElement;
-	private container?: HTMLElement;
+	private readonly element: HTMLElement;
+	private readonly container: HTMLElement = document.body;
 	private classes: string[];
 	private readonly ariaLabel: string;
 	private readonly tooltip: string;
 	private readonly position: ResizeHandlePosition;
-	private handlePosition: { x: number; y: number } = { x: 0, y: 0 };
+	private lastDragPosition?: HandleLocation;
+	private handlePosition?: HandleLocation;
+	private context: ContextHandler;
+	private oppositeSide: ResizeHandlePosition;
 
-	constructor({ element, container, position, className, ariaLabel, tooltip }: ResizeHandleProps) {
+	constructor({ element, position, className, ariaLabel, tooltip }: ResizeHandleProps) {
 		this.element = element;
-		this.container = (container instanceof HTMLElement) ? container : (element.parentElement ?? document.body);
+		this.container = element.parentElement ?? document.body;
 		this.classes = ['vt-resizable', className].filter(cls => cls !== undefined);
 		this.ariaLabel = ariaLabel ?? 'Resize';
 		this.tooltip = tooltip ?? ariaLabel ?? 'Resize';
 		this.position = position;
-		this.handlePosition = { x: 0, y: 0 };
+		this.oppositeSide = getOppositeSide(position);
+		this.lastDragPosition = undefined;
+		this.handlePosition = undefined;
+		this.context = new ContextHandler({ element: this.element, container: this.container });
 
 		this.maybeAddClasses();
 		this.maybeAddResizeHandle();
@@ -75,88 +88,96 @@ export class ResizeHandle {
 	}
 
 	canResize() {
-		switch(this.position) {
-			case ResizeHandlePosition.RIGHT:
-				return this.canGoRight();
-			case ResizeHandlePosition.LEFT:
-				return this.canGoLeft();
-			case ResizeHandlePosition.BOTTOM:
-				return this.canGoDown();
-			case ResizeHandlePosition.TOP:
-				return this.canGoUp();
-		}
+		const space = this.context.calculateFreeSpace(this.position);
+
+		return space >= 32; // 32px is a minimum to avoid showing the handle when there is very little space to resize
 	}
 
-	canGoLeft() {
-		const diff = Math.ceil(this.element.getBoundingClientRect().left) - Math.floor(this.container!.getBoundingClientRect().left);
-
-		return diff > 32; // more space than the width of the handle
+	getHandlePosition(event: DragEvent) {
+		return {
+			x: event.clientX,
+			y: event.clientY
+		};
 	}
 
-	canGoRight() {
-		const diff = Math.floor(this.container!.getBoundingClientRect().right) - Math.ceil(this.element.getBoundingClientRect().right);
-
-		return diff > 32; // more space than the width of the handle
-	}
-
-	canGoUp() {
-		const diff = Math.ceil(this.element.getBoundingClientRect().top) - Math.floor(this.container!.getBoundingClientRect().top);
-
-		return diff > 32; // more space than the height of the handle
-	}
-
-	canGoDown() {
-		const diff = Math.floor(this.container!.getBoundingClientRect().bottom) - Math.ceil(this.element.getBoundingClientRect().bottom);
-
-		return diff > 32; // more space than the height of the handle
+	onDragStart(event: DragEvent) {
+		this.handlePosition = this.getHandlePosition(event);
+		this.container.addEventListener('dragover', this.onContainerDragOver.bind(this));
 	}
 
 	onContainerDragOver(event: DragEvent) {
 		event.preventDefault(); // Prevent the cursor being the "not allowed" one while dragging
+
+		// Keep updating the last known good position here, because getting the drop position on drag end is unreliable
+		this.lastDragPosition = this.getHandlePosition(event);
 	}
 
-	onDragStart(event: DragEvent) {
-		this?.container?.addEventListener('dragover', this.onContainerDragOver.bind(this));
+	onDragEnd() {
+		this.container.removeEventListener('dragover', this.onContainerDragOver.bind(this));
 
-		// Save the handle position when the drag starts so we can use it to calculate the position change
-		this.handlePosition = this.getHandlePosition(event);
-	}
-
-	onDragEnd(event: DragEvent) {
-		this?.container?.removeEventListener('dragover', this.onContainerDragOver.bind(this));
+		if (!this.handlePosition || !this.lastDragPosition) return;
 
 		const oldHandlePosition = this.handlePosition;
-		const newHandlePosition = this.getHandlePosition(event);
+		const newHandlePosition = this.lastDragPosition;
 
-		// TODO: This needs to account for the element not being on the furthest edge of its container, e.g., centered example
-		// switch(this.position) {
-		// 	case 'right':
-		// 		this.element.style.setProperty('width', `${event.pageX - this.element.getBoundingClientRect().left}px`, 'important');
-		// 		break;
-		// 	case 'left':
-		// 		this.element.style.setProperty('width', `${this.element.getBoundingClientRect().right - event.pageX}px`, 'important');
-		// 		break;
-		// 	case 'bottom':
-		// 		this.element.style.setProperty('height', `${event.pageY - this.element.getBoundingClientRect().top}px`, 'important');
-		// 		break;
-		// 	case 'top':
-		// 		this.element.style.setProperty('height', `${this.element.getBoundingClientRect().bottom - event.pageY}px`, 'important');
-		// 		break;
-		// }
+		if(this.position === ResizeHandlePosition.RIGHT || this.position === ResizeHandlePosition.LEFT) {
+			const diffX = newHandlePosition.x - oldHandlePosition.x;
+			this.updateElementWidth(diffX);
+		}
+		else {
+			const diffY = newHandlePosition.y - oldHandlePosition.y;
+			this.updateElementHeight(diffY);
+		}
 	}
 
-	getHandlePosition(event: DragEvent) {
-		console.log(this.container!.getBoundingClientRect());
-		console.log(event);
-		//  TODO: Get the X and Y coordinates of the drop position relative to the container, where the top-left corner of the container is (0, 0)
-		const offsetX = 1;
-		const offsetY = 1;
+	updateElementWidth(diffX: number) {
+		if(isNaN(diffX)) return;
 
-		return {
-			x: offsetX,
-			y: offsetY,
-		};
+		const space = this.context.calculateFreeSpace(this.position);
+		const oppositeSpace = this.context.calculateFreeSpace(this.oppositeSide);
+		const elementRect = this.element.getBoundingClientRect();
+
+		// If no space on the opposite side, just adjust width by the amount the handle was dragged
+		if(oppositeSpace < 32) {
+			this.element.style.width = this.position === ResizeHandlePosition.RIGHT
+				? `${elementRect.width + diffX}px`
+				: `${elementRect.width - diffX}px`;
+
+			return;
+		}
+
+		// Otherwise, double the amount the handle was dragged,
+		// to account for the fact that the element will be resizing in both directions as the handle is dragged
+		// - this will put the dragged edge where the handle was dragged to
+		this.element.style.width = this.position === ResizeHandlePosition.RIGHT
+			? `${elementRect.width + (diffX * 2)}px`
+			: `${elementRect.width - (diffX * 2)}px`;
 	}
+
+	updateElementHeight(diffY: number) {
+		if(isNaN(diffY)) return;
+
+		const space = this.context.calculateFreeSpace(this.position);
+		const oppositeSpace = this.context.calculateFreeSpace(this.oppositeSide);
+		const elementRect = this.element.getBoundingClientRect();
+
+		// If no space on the opposite side, just adjust width by the amount the handle was dragged
+		if(oppositeSpace < 32) {
+			this.element.style.height = this.position === ResizeHandlePosition.BOTTOM
+				? `${elementRect.height + diffY}px`
+				: `${elementRect.height - diffY}px`;
+
+			return;
+		}
+
+		// Otherwise, double or halve the amount the handle was dragged (depending on side),
+		// to account for the fact that the element will be resizing in both directions as the handle is dragged
+		// - this will put the dragged edge where the handle was dragged to
+		this.element.style.height = this.position === ResizeHandlePosition.BOTTOM
+			? `${elementRect.height + (diffY * 2)}px`
+			: `${elementRect.height - (diffY * 2)}px`;
+	}
+
 
 	// TODO: Keyboard interaction
 }

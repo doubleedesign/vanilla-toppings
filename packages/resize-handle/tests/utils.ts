@@ -2,6 +2,7 @@ import type { HtmlRenderer, StoryObj } from '@storybook/html-vite';
 import type { DecoratorFunction, StoryContext } from 'storybook/internal/csf';
 import type { ResizeHandleStoryProps } from './resize-handle.stories';
 import { loadManagerOrAddonsFile } from "storybook/internal/common";
+import { ContextHandler } from "../src/ContextHandler";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type MockedContext = Partial<StoryContext<HtmlRenderer, ResizeHandleStoryProps>> & any;

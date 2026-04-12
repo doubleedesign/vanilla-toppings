@@ -40,5 +40,11 @@ export default defineConfig({
 				},
 			},
 		],
+		coverage: {
+			exclude: [
+				'**/*.stories.ts',
+				'**/tests/**',
+			],
+		},
 	},
 });

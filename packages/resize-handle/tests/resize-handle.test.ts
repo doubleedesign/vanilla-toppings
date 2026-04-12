@@ -1,10 +1,37 @@
 import { Basic } from './resize-handle.stories';
-import { screen, waitFor } from '@testing-library/dom';
+import { fireEvent, screen, waitFor } from '@testing-library/dom';
 import { mockBoundingClientRect, RenderStory } from './utils';
 import { ResizeHandle } from '../src/ResizeHandle';
-import { ResizeHandlePosition } from "../src/types";
+import { ResizeHandlePosition, ResizeHandleProps } from "../src/types";
+import { ContextHandler } from "../src/ContextHandler";
+import { getOppositeSide } from "../src/utils";
 
 const canResizeSpy = vi.spyOn(ResizeHandle.prototype, 'canResize');
+const updateWidthSpy = vi.spyOn(ResizeHandle.prototype, 'updateElementWidth');
+const updateHeightSpy = vi.spyOn(ResizeHandle.prototype, 'updateElementHeight');
+
+async function setupBasicComponent(args?: Partial<ResizeHandleProps>, waitForHandle = true) {
+	const example = document.createElement('resize-handle-demo');
+	document.body.appendChild(example);
+
+	const element = screen.getByTestId('vt-demo-element');
+	const container = example;
+
+	const instance = new ResizeHandle({ element: element as HTMLElement, position: args?.position ?? ResizeHandlePosition.RIGHT });
+
+	if(waitForHandle) {
+		const handle = await waitFor(() => {
+			const element = screen.queryByRole('button', { name: /resize/i });
+			expect(element).toBeInTheDocument();
+
+			return element;
+		});
+
+		return { element, container, instance, handle };
+	}
+
+	return { element, container, instance, handle: null };
+}
 
 describe('ResizeHandle', () => {
 
@@ -16,43 +43,26 @@ describe('ResizeHandle', () => {
 	it('should attempt to add the resize handle when initialised', async () => {
 		const addHandleSpy = vi.spyOn(ResizeHandle.prototype, 'maybeAddResizeHandle');
 
-		const example = document.createElement('resize-handle-demo');
-		document.body.appendChild(example);
-
-		const element = screen.getByTestId('vt-demo-element');
-		const container = example;
-
-		new ResizeHandle({ element: element as HTMLElement, container: container, position: ResizeHandlePosition.RIGHT });
+		await setupBasicComponent({}, false);
 
 		expect(addHandleSpy).toHaveBeenCalled();
 	});
 
 	it('should add the default class name to the element', async () => {
 		canResizeSpy.mockReturnValue(true);
-		const example = document.createElement('resize-handle-demo');
-		document.body.appendChild(example);
 
-		const element = screen.getByTestId('vt-demo-element');
-		const container = example;
-
-		new ResizeHandle({ element: element as HTMLElement, container: container, position: ResizeHandlePosition.RIGHT });
+		await setupBasicComponent({}, false);
 
 		await waitFor(() => {
 			const element = screen.getByTestId('vt-demo-element');
-			screen.debug();
 			expect(element).toHaveClass('vt-resizable');
 		});
 	});
 
 	it('should not add the default class name to the element if it cannot be resized', async () => {
 		canResizeSpy.mockReturnValue(false);
-		const example = document.createElement('resize-handle-demo');
-		document.body.appendChild(example);
 
-		const element = screen.getByTestId('vt-demo-element');
-		const container = example;
-
-		new ResizeHandle({ element: element as HTMLElement, container: container, position: ResizeHandlePosition.RIGHT });
+		await setupBasicComponent({}, false);
 
 		await waitFor(() => {
 			const element = screen.getByTestId('vt-demo-element');
@@ -60,220 +70,163 @@ describe('ResizeHandle', () => {
 		});
 	});
 
-	describe('element on the left of the container + handle position right', () => {
-		test("getHandlePosition should return an X value equal to the element's width when there is no space on the left", async () => {
+	/**
+	 * onDragEnd handles the movement of the handle along the X or Y axis, where the top left corner of the container is 0,0.
+	 * If the handle is dragged to the left or up, the difference in position will be a negative value
+	 * (e.g., element edge was at 200 and the handle is dragged to the left 100px, its position would now be 100px on the X axis).
+	 * If the handle is dragged to the right or down, the difference in position will be a positive value.
+	 */
+	describe('onDragEnd', () => {
+		it.each(
+			[ResizeHandlePosition.LEFT, ResizeHandlePosition.RIGHT]
+		)('calls updateElementWidth with a negative value if the handle on the %s is dragged to the left', async (position) => {
 			canResizeSpy.mockReturnValue(true);
+			const { element, instance } = await setupBasicComponent({ position });
 
-			const example = document.createElement('resize-handle-demo');
-			document.body.appendChild(example);
+			mockBoundingClientRect(element, 200, 200);
 
-			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
+			// Simulate dragging the handle 100px to the left by calling the instance's matching methods with explicit values
+			// (due to limitations on JDOM/happy-dom with fireEvent, even with explicit values)
+			instance.onDragStart({ clientX: 200, clientY: 0, preventDefault: () => {} } as unknown as DragEvent);
+			instance.onContainerDragOver({ clientX: 100, clientY: 0, preventDefault: () => {} } as unknown as DragEvent);
+			instance.onDragEnd();
 
-			mockBoundingClientRect(container, 600, 400);
-			mockBoundingClientRect(element, 200, 100, 'left');
-
-			const instance = new ResizeHandle({
-				element: element as HTMLElement,
-				container: container,
-				position: ResizeHandlePosition.RIGHT
-			});
-
-			// TODO
-			expect(instance.getHandlePosition({})).toEqual(expect.objectContaining({ x: 200 }));
+			expect(updateWidthSpy).toHaveBeenCalledOnce();
+			expect(updateWidthSpy).toHaveBeenCalledWith(-100);
 		});
 
-		test("getHandlePosition should return an X value equal to the element's width PLUS the space on the left side", async () => {
+		it.each(
+			[ResizeHandlePosition.LEFT, ResizeHandlePosition.RIGHT]
+		)('calls updateElementWidth with a positive value if the handle on the %s is dragged to the right', async (position) => {
 			canResizeSpy.mockReturnValue(true);
+			const { element, instance } = await setupBasicComponent({ position });
 
-			const example = document.createElement('resize-handle-demo');
-			document.body.appendChild(example);
+			mockBoundingClientRect(element, 200, 200);
 
-			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
+			instance.onDragStart({ clientX: 200, clientY: 0, preventDefault: () => {} } as unknown as DragEvent);
+			instance.onContainerDragOver({ clientX: 300, clientY: 0, preventDefault: () => {}
+			} as unknown as DragEvent);
+			instance.onDragEnd();
 
-			mockBoundingClientRect(container, 600, 400);
-			mockBoundingClientRect(element, 200, 100, 'left', 50);
-
-			const instance = new ResizeHandle({
-				element: element as HTMLElement,
-				container: container,
-				position: ResizeHandlePosition.RIGHT
-			});
-
-			// TODO
-			expect(instance.getHandlePosition({})).toEqual(expect.objectContaining({ x: 250 }));
-		});
-	});
-
-	describe('element is on the right of the container + handle position is left', () => {
-		// eslint-disable-next-line max-len
-		test("getHandlePosition should return an X value equal to the space between the left container edge and the element when there is no space on the right", async () => {
-			canResizeSpy.mockReturnValue(true);
-
-			const example = document.createElement('resize-handle-demo');
-			document.body.appendChild(example);
-
-			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
-
-			mockBoundingClientRect(container, 1000, 500);
-			mockBoundingClientRect(element, 200, 100, 'right');
-
-			const instance = new ResizeHandle({
-				element: element as HTMLElement,
-				container: container,
-				position: ResizeHandlePosition.RIGHT
-			});
-
-			// TODO
-			expect(instance.getHandlePosition({})).toEqual(expect.objectContaining({ x: 800 }));
+			expect(updateWidthSpy).toHaveBeenCalledOnce();
+			expect(updateWidthSpy).toHaveBeenCalledWith(100);
 		});
 
-		test("getHandlePosition should return an X value equal to the element's width MINUS the space on the right side", async () => {
+
+		it.each(
+			[ResizeHandlePosition.TOP, ResizeHandlePosition.BOTTOM]
+		)('calls updateElementHeight with a negative value if the handle on the %s is dragged up', async (position) => {
 			canResizeSpy.mockReturnValue(true);
+			const { element, instance } = await setupBasicComponent({ position });
 
-			const example = document.createElement('resize-handle-demo');
-			document.body.appendChild(example);
+			mockBoundingClientRect(element, 200, 200);
 
-			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
+			// Simulate dragging the handle 100px to the left by calling the instance's matching methods with explicit values
+			// (due to limitations on JDOM/happy-dom with fireEvent, even with explicit values)
+			instance.onDragStart({ clientX: 0, clientY: 200, preventDefault: () => {} } as unknown as DragEvent);
+			instance.onContainerDragOver({ clientX: 0, clientY: 100, preventDefault: () => {} } as unknown as DragEvent);
+			instance.onDragEnd();
 
-			mockBoundingClientRect(container, 600, 400);
-			mockBoundingClientRect(element, 200, 100, 'right', 50);
+			expect(updateHeightSpy).toHaveBeenCalledOnce();
+			expect(updateHeightSpy).toHaveBeenCalledWith(-100);
+		});
 
-			const instance = new ResizeHandle({
-				element: element as HTMLElement,
-				container: container,
-				position: ResizeHandlePosition.LEFT
-			});
+		it.each(
+			[ResizeHandlePosition.TOP, ResizeHandlePosition.BOTTOM]
+		)('calls updateElementWidth with a positive value if the handle on the %s is dragged down', async (position) => {
+			canResizeSpy.mockReturnValue(true);
+			const { element, instance } = await setupBasicComponent({ position: position });
 
-			// TODO
-			expect(instance.getHandlePosition({})).toEqual(expect.objectContaining({ x: 150 }));
+			mockBoundingClientRect(element, 200, 200);
+
+			instance.onDragStart({ clientX:0, clientY: 200, preventDefault: () => {} } as unknown as DragEvent);
+			instance.onContainerDragOver({ clientX: 0, clientY: 300, preventDefault: () => {} } as unknown as DragEvent);
+			instance.onDragEnd();
+
+			expect(updateHeightSpy).toHaveBeenCalledOnce();
+			expect(updateHeightSpy).toHaveBeenCalledWith(100);
 		});
 	});
 
-	describe("element is at the top of the container + handle position is bottom", () => {
-		test("getHandlePosition should return a Y value equal to the element's height when there is no space above", async () => {
-			canResizeSpy.mockReturnValue(true);
+	describe('decreasing element size', () => {
+		const element = document.createElement('div');
+		element.setAttribute('data-testid', 'vt-demo-element');
 
-			const example = document.createElement('resize-handle-demo');
-			document.body.appendChild(example);
+		it.each([ResizeHandlePosition.LEFT, ResizeHandlePosition.RIGHT])('applies the width change correctly when resizing from the %s', (position) => {
+			mockBoundingClientRect(element, 200, 200, getOppositeSide(position));
+			const instance = new ResizeHandle({ element, position });
 
-			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
+			// Negative diff = moved to the left/up, Positive diff = moved to the right/down
+			instance.updateElementWidth(position === ResizeHandlePosition.RIGHT ? -100 : 100);
 
-			mockBoundingClientRect(container, 600, 400);
-			mockBoundingClientRect(element, 200, 100, 'top');
-
-			const instance = new ResizeHandle({ element: element as HTMLElement, container: container, position: ResizeHandlePosition.BOTTOM });
-
-			// TODO
-			expect(instance.getHandlePosition({})).toEqual(expect.objectContaining({ y: 100 }));
+			expect(element.style.width).toEqual('100px');
 		});
 
-		test("getHandlePosition should return a Y value equal to the element's height PLUS the space above", async () => {
-			canResizeSpy.mockReturnValue(true);
+		it.each([ResizeHandlePosition.TOP, ResizeHandlePosition.BOTTOM])('applies the height change correctly when resizing from the %s', (position) => {
+			mockBoundingClientRect(element, 200, 200, getOppositeSide(position));
+			const instance = new ResizeHandle({ element, position });
 
-			const example = document.createElement('resize-handle-demo');
-			document.body.appendChild(example);
+			// Negative diff = moved to the left/up, Positive diff = moved to the right/down
+			instance.updateElementHeight(position === ResizeHandlePosition.BOTTOM ? -100 : 100);
 
-			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
-
-			mockBoundingClientRect(container, 600, 400);
-			mockBoundingClientRect(element, 200, 100, 'top', 50);
-
-			const instance = new ResizeHandle({ element: element as HTMLElement, container: container, position: ResizeHandlePosition.BOTTOM });
-
-			// TODO
-			expect(instance.getHandlePosition({})).toEqual(expect.objectContaining({ y: 150 }));
+			expect(element.style.height).toEqual('100px');
 		});
 	});
 
-	describe("element is at the bottom of the container + handle position is top", () => {
-		test("getHandlePosition should return a Y value equal to the space between the top container edge and the element", async () => {
-			canResizeSpy.mockReturnValue(true);
+	describe('increasing element size', () => {
+		const element = document.createElement('div');
+		element.setAttribute('data-testid', 'vt-demo-element');
 
-			const example = document.createElement('resize-handle-demo');
-			document.body.appendChild(example);
+		it.each([ResizeHandlePosition.LEFT, ResizeHandlePosition.RIGHT])('applies the width change correctly when resizing from the %s', (position) => {
+			mockBoundingClientRect(element, 200, 200, getOppositeSide(position));
+			const instance = new ResizeHandle({ element, position });
 
-			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
+			instance.updateElementWidth(position === ResizeHandlePosition.RIGHT ? 100 : -100);
 
-			mockBoundingClientRect(container, 600, 400);
-			mockBoundingClientRect(element, 200, 100, 'bottom');
-
-			const instance = new ResizeHandle({ element: element as HTMLElement, container: container, position: ResizeHandlePosition.TOP });
-
-			// TODO
-			expect(instance.getHandlePosition({})).toEqual(expect.objectContaining({ y: 300 }));
+			expect(element.style.width).toEqual('300px');
 		});
 
-		test("getHandlePosition should return a Y value equal to the element's height MINUS the space below", async () => {
-			canResizeSpy.mockReturnValue(true);
+		it.each([ResizeHandlePosition.TOP, ResizeHandlePosition.BOTTOM])('applies the height change correctly when resizing from the %s', (position) => {
+			mockBoundingClientRect(element, 200, 200, getOppositeSide(position));
+			const instance = new ResizeHandle({ element, position });
 
-			const example = document.createElement('resize-handle-demo');
-			document.body.appendChild(example);
+			instance.updateElementHeight(position === ResizeHandlePosition.BOTTOM ? 100 : -100);
 
-			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
-
-			mockBoundingClientRect(container, 600, 400);
-			mockBoundingClientRect(element, 200, 100, 'bottom', 50);
-
-			const instance = new ResizeHandle({ element: element as HTMLElement, container: container, position: ResizeHandlePosition.TOP });
-
-			// TODO
-			expect(instance.getHandlePosition({})).toEqual(expect.objectContaining({ y: 250 }));
+			expect(element.style.height).toEqual('300px');
 		});
+
 	});
 
 	describe('canResize', () => {
 
-		it.each([
-			['left', 'left', false],
-			['right', 'right', false],
-			['top', 'top', false],
-			['bottom', 'bottom', false],
-			['left', 'right', true],
-			['right', 'left', true],
-			['top', 'bottom', true],
-			['bottom', 'top', true],
-		])('if position is %s and element is flush with the %s edge of the container, canResize returns %s', (position, containerSide, expected) => {
+		it('returns false if there is no free space', () => {
+			const spaceSpy = vi.spyOn(ContextHandler.prototype, 'calculateFreeSpace').mockReturnValue(0);
+
 			const example = document.createElement('resize-handle-demo');
 			document.body.appendChild(example);
 
 			const element = screen.getByTestId('vt-demo-element');
-			const container = example;
 
-			// By default, set the element to be inside the container with space on all sides,
-			// but if expected = false, override the given side's position to be the same for both elements to simulate them being flush against each other
-			if(!expected) {
-				mockBoundingClientRect(container, 600, 400);
-				mockBoundingClientRect(element, 100, 100, position);
-			}
-			else {
-				mockBoundingClientRect(container, 600, 400);
-				switch(position) {
-					case 'left':
-						mockBoundingClientRect(element, 100, 100, 'right');
-						break;
-					case 'right':
-						mockBoundingClientRect(element, 100, 100, 'left');
-						break;
-					case 'top':
-						mockBoundingClientRect(element, 100, 100, 'bottom');
-						break;
-					case 'bottom':
-						mockBoundingClientRect(element, 100, 100, 'top');
-						break;
-				}
-			}
+			const instance = new ResizeHandle({ element: element as HTMLElement, position: ResizeHandlePosition.RIGHT });
 
-			const instance = new ResizeHandle({ element: element as HTMLElement, container: container, position: position as ResizeHandlePosition });
+			expect(instance.canResize()).toEqual(false);
 
-			expect(instance.canResize()).toEqual(expected);
+			spaceSpy.mockRestore();
+		});
+
+		it('returns true if there is free space', () => {
+			const spaceSpy = vi.spyOn(ContextHandler.prototype, 'calculateFreeSpace').mockReturnValue(100);
+
+			const example = document.createElement('resize-handle-demo');
+			document.body.appendChild(example);
+
+			const element = screen.getByTestId('vt-demo-element');
+
+			const instance = new ResizeHandle({ element: element as HTMLElement, position: ResizeHandlePosition.RIGHT });
+
+			expect(instance.canResize()).toEqual(true);
+
+			spaceSpy.mockRestore();
 		});
 	});
 

@@ -5,8 +5,6 @@ import type { ResizeHandleStoryProps } from './resize-handle.stories';
 
 /**
  * Decorator to initialise the resize handle once the demo page has rendered.
- * @param param0
- * @param param0.container
  */
 export const withResizeHandle = ({ container }: Partial<ResizeHandleStoryProps>) => {
 	return (Story: PartialStoryFn, context: StoryContext) => {

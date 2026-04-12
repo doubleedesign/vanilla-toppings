@@ -31,6 +31,11 @@ const styles = `
 		display: flex;
 		min-height: 400px;
 		box-sizing: border-box;
+		border: 2px dotted #333;
+		width: 1200px;
+		min-height: 90vh;
+		max-height: 90vh;
+		margin: 0 auto;
 	}
 
 	resize-handle-demo[data-example-variant="centered"] {
@@ -39,17 +44,17 @@ const styles = `
 	}
 
 	resize-handle-demo[data-example-variant="contained"] {
-		border: 2px dotted #333;
-		width: 900px;
-		min-height: 600px;
-		max-height: 600px;
-		margin: 0 auto;
+	}
+	
+	.docs-story resize-handle-demo[data-example-variant="contained"] {
+		width: 100%;
+		min-height: 400px;
+		max-height: 400px;
 	}
 
 	[data-testid="vt-demo-element"] {
 		background-color: #eee;
 		width: 30%;
-		min-width: 400px;
 		height: 300px;
 		box-sizing: border-box;
 		padding: 1rem;

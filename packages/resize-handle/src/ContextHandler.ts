@@ -43,9 +43,6 @@ export class ContextHandler {
 			return total + (calculatingVertical ? siblingRect.height : siblingRect.width);
 		}, 0);
 
-		const elementSize = calculatingVertical ? elementRect.height : elementRect.width;
-		const containerSize = calculatingVertical ? containerRect.height : containerRect.width;
-
 		// If we want the space on the left or top, we just need to compare the element's position to the container edge
 		// and subtract the size of any siblings in the way
 		if (side === ResizeHandlePosition.LEFT || side === ResizeHandlePosition.TOP) {
