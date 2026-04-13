@@ -10,7 +10,7 @@ import '../src/resize-handle.css';
 import { withSiblings } from "./with-siblings";
 
 const meta: Meta = {
-	title: 'Vanilla Toppings/ResizeHandle',
+	title: 'ResizeHandle',
 	tags: ['autodocs'],
 	args: {
 		position: ResizeHandlePosition.RIGHT,
