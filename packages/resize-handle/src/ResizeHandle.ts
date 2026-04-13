@@ -139,9 +139,11 @@ export class ResizeHandle {
 
 		// If no space on the opposite side, just adjust width by the amount the handle was dragged
 		if(oppositeSpace < 32) {
-			this.element.style.width = this.position === ResizeHandlePosition.RIGHT
+			const newWidth = this.position === ResizeHandlePosition.RIGHT
 				? `${elementRect.width + diffX}px`
 				: `${elementRect.width - diffX}px`;
+
+			this.element.style.setProperty('width', newWidth, 'important');
 
 			return;
 		}
@@ -149,9 +151,11 @@ export class ResizeHandle {
 		// Otherwise, double the amount the handle was dragged,
 		// to account for the fact that the element will be resizing in both directions as the handle is dragged
 		// - this will put the dragged edge where the handle was dragged to
-		this.element.style.width = this.position === ResizeHandlePosition.RIGHT
+		const newWidth = this.position === ResizeHandlePosition.RIGHT
 			? `${elementRect.width + (diffX * 2)}px`
 			: `${elementRect.width - (diffX * 2)}px`;
+
+		this.element.style.setProperty('width', newWidth, 'important');
 	}
 
 	updateElementHeight(diffY: number) {
@@ -163,9 +167,11 @@ export class ResizeHandle {
 
 		// If no space on the opposite side, just adjust width by the amount the handle was dragged
 		if(oppositeSpace < 32) {
-			this.element.style.height = this.position === ResizeHandlePosition.BOTTOM
+			const newHeight = this.position === ResizeHandlePosition.BOTTOM
 				? `${elementRect.height + diffY}px`
 				: `${elementRect.height - diffY}px`;
+
+			this.element.style.setProperty('height', newHeight, 'important');
 
 			return;
 		}
@@ -173,9 +179,11 @@ export class ResizeHandle {
 		// Otherwise, double or halve the amount the handle was dragged (depending on side),
 		// to account for the fact that the element will be resizing in both directions as the handle is dragged
 		// - this will put the dragged edge where the handle was dragged to
-		this.element.style.height = this.position === ResizeHandlePosition.BOTTOM
+		const newHeight = this.position === ResizeHandlePosition.BOTTOM
 			? `${elementRect.height + (diffY * 2)}px`
 			: `${elementRect.height - (diffY * 2)}px`;
+
+		this.element.style.setProperty('height', newHeight, 'important');
 	}
 
 

@@ -1,7 +1,7 @@
 {
 	"name": "@doubleedesign/vanilla-resize-handle",
 	"author": "Leesa Ward <contact@doubleedesign.com.au>",
-	"version": "0.0.1",
+	"version": "0.0.4",
 	"type": "module",
 	"repository": {
 		"type": "git",
