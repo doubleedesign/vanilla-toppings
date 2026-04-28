@@ -1,0 +1,21 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"outDir": "dist",
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"declaration": true
+	},
+	"include": ["**/*.ts"],
+	"exclude": [
+		"node_modules",
+		"dist",
+		"tests",
+		"**/*.test.ts",
+		"**/*.spec.ts",
+		"**/*.stories.ts",
+		"**/*.Demo.ts",
+		"vitest.setup.ts"
+	]
+}

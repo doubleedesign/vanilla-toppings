@@ -16,6 +16,7 @@ export default defineConfig({
 					include: ['**/*.test.ts'],
 					// at the time of writing, happy-dom supports document.adoptedStyleSheets (used in the demo web component) whereas jsdom does not
 					environment: 'happy-dom',
+					// Note: Some packages need their own vitest setup, so should be run from their working directory so it gets picked up
 					setupFiles: ['./vitest.setup.ts'],
 					globals: true,
 					css: true,
