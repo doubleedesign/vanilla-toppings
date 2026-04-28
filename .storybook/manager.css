@@ -452,26 +452,16 @@
   font-family: "Fira Code", monospace !important;
 }
 
-.sbdocs-content .sbdocs-title {
-  font: var(--font-xl);
-  font-family: var(--font-family-accent);
-}
-
-.sbdocs-content .sbdocs-subtitle {
-  font: var(--font-md);
-}
-
-.sbdocs-content p, .sbdocs-content li {
-  font-size: var(--font-size-base);
-}
-
-.sbdocs-content .docblock-argstable-body {
+#storybook-explorer-tree button {
   font-size: var(--font-size-sm);
+  font-weight: 530;
+}
+
+#storybook-explorer-tree .sidebar-item button, #storybook-explorer-tree .sidebar-item a {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
 }
 
 
-.sb-show-main {
-  min-height: 100vh;
-}
 
-/*# sourceMappingURL=preview.css.map */
+/*# sourceMappingURL=manager.css.map */

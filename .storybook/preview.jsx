@@ -1,6 +1,13 @@
 import { spyOn } from 'storybook/test';
-import './preview.css';
 import { Title, Subtitle, Description, Primary, Controls, Stories, Source } from '@storybook/addon-docs/blocks';
+import { themes } from 'storybook/theming';
+import { doubleeTheme } from '@doubleedesign/doublee-site-style';
+import './preview.css';
+
+const mergedTheme = {
+	...themes.light,
+	...doubleeTheme
+};
 
 /** @type { import('@storybook/html-vite').Preview } */
 const preview = {
@@ -16,6 +23,7 @@ const preview = {
 			},
 		},
 		docs: {
+			theme: mergedTheme,
 			page: () => (
 				<>
 					<Title />

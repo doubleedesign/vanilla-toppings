@@ -18,8 +18,7 @@ const config = {
 		'@whitespace/storybook-addon-html',
 		'@storybook/addon-vitest',
 	],
-	framework: '@storybook/html-vite',
-	staticDirs: ['../sb-assets']
+	framework: '@storybook/html-vite'
 };
 
 export default config;
