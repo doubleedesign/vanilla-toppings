@@ -214,5 +214,26 @@ describe("Typographer's Quotes", () => {
 
 		const result = screen.getByTestId('test-wrapper').innerHTML;
 		expect(result).toEqual('<p>Here is some code:</p><pre>const message = \'Hello\';</pre>');
-	});  
+	});
+
+	it('ignores elements not in a specified root element', () => {
+		const example = document.createElement('div');
+		example.setAttribute('data-testid', 'test-wrapper');
+		example.innerHTML = `<p>"Hello, World!"</p><p>'Another quote'</p>`;
+		document.body.appendChild(example);
+
+		const instance = new TypographersQuotes({ selectors: ['[data-testid="test-wrapper"]'] });
+		instance.apply();
+
+		const result = screen.getByTestId('test-wrapper').innerHTML;
+		expect(result).toEqual('<p>“Hello, World!”</p><p>‘Another quote’</p>');
+
+		const outsideExample = document.createElement('p');
+		outsideExample.setAttribute('data-testid', 'outside-example');
+		outsideExample.innerHTML = `"This should not be converted."`;
+		document.body.appendChild(outsideExample);
+
+		const outsideResult = screen.getByTestId('outside-example').innerHTML;
+		expect(outsideResult).toEqual(`"This should not be converted."`);
+	});
 });
