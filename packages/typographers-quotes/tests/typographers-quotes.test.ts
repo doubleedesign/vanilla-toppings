@@ -99,6 +99,32 @@ describe("Typographer's Quotes", () => {
 		expect(result).toEqual('<p>It’s a test.</p>');
 	});
 
+	it('converts multiple apostrophes in a sentence', () => {
+		const example = document.createElement('div');
+		example.setAttribute('data-testid', 'test-wrapper');
+		example.innerHTML = `<p>You don't have a TV? What's all your furniture pointed at?</p>`;
+		document.body.appendChild(example);
+
+		const instance = new TypographersQuotes({ selectors: ['[data-testid="test-wrapper"]'] });
+		instance.apply();
+
+		const result = screen.getByTestId('test-wrapper').innerHTML;
+		expect(result).toEqual('<p>You don’t have a TV? What’s all your furniture pointed at?</p>');
+	});
+
+	it('converts multiple apostrophes in a sentence wrapped in double quotes', () => {
+		const example = document.createElement('div');
+		example.setAttribute('data-testid', 'test-wrapper');
+		example.innerHTML = `<p>"You don't have a TV? What's all your furniture pointed at?"</p>`;
+		document.body.appendChild(example);
+
+		const instance = new TypographersQuotes({ selectors: ['[data-testid="test-wrapper"]'] });
+		instance.apply();
+
+		const result = screen.getByTestId('test-wrapper').innerHTML;
+		expect(result).toEqual('<p>“You don’t have a TV? What’s all your furniture pointed at?”</p>');
+	});
+
 	it('converts an apostrophe after an S at the end of a word', () => {
 		const example = document.createElement('div');
 		example.setAttribute('data-testid', 'test-wrapper');
@@ -113,6 +139,19 @@ describe("Typographer's Quotes", () => {
 	});
 
 	it('converts a single quote at the beginning of a word', () => {
+		const example = document.createElement('div');
+		example.setAttribute('data-testid', 'test-wrapper');
+		example.innerHTML = `<p>&nbsp;'Tis the season.</p>`;
+		document.body.appendChild(example);
+
+		const instance = new TypographersQuotes({ selectors: ['[data-testid="test-wrapper"]'] });
+		instance.apply();
+
+		const result = screen.getByTestId('test-wrapper').innerHTML;
+		expect(result).toEqual('<p>&nbsp;’Tis the season.</p>');
+	});
+
+	it('converts a single quote at the beginning of a word that is the first character in the element', () => {
 		const example = document.createElement('div');
 		example.setAttribute('data-testid', 'test-wrapper');
 		example.innerHTML = `<p>'Tis the season.</p>`;

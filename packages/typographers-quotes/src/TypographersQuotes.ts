@@ -1,17 +1,20 @@
-type TypographersQuotesParams = {
+export type TypographersQuotesParams = {
 	selectors: string[];
+	root?: Document | Element;
 };
 
 export class TypographersQuotes {
 	private selectors: string[];
+	private root: Document | Element;
 
-	constructor({ selectors }: TypographersQuotesParams) {
+	constructor({ selectors, root = document }: TypographersQuotesParams) {
 		this.selectors = selectors;
+		this.root = root;
 	}
 
 	apply(): void {
 		this.selectors.forEach(selector => {
-			const elements = document.querySelectorAll(selector);
+			const elements = this.root.querySelectorAll(selector);
 			elements.forEach(element => {
 				this.processChildren(element);
 			});
@@ -35,7 +38,12 @@ export class TypographersQuotes {
 			.replaceAll(/"([^"]*)"/g, '“$1”')
 			// Replace single quote pairs with typographic quote pairs
 			.replaceAll(/'([^']*)'/g, '‘$1’')
-			// Replace standalone single quotes (likely to be apostrophes at this point) with typographic single quote
+			// Replace standalone single quotes that are not preceded by a space (likely to be apostrophes)
+			.replaceAll(/(\S)'/g, '$1’')
+			// Fix left single quotes that are not the first character
+			// AND are not preceded by a space (likely to be apostrophes, so should be right quotes)
+			.replaceAll(/([^ ])‘/g, '$1’')
+			// Any remaining standalone single quotes should probably be right quotes, e.g., contractions at the start of the word
 			.replaceAll(/'/g, '’');
 	}
 }
