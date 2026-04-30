@@ -1,0 +1,57 @@
+name: Release typographers-quotes
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'packages/typographers-quotes/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+        working-directory: packages/typographers-quotes
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: packages/typographers-quotes/dist/
+
+  publish-github:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          gh release create "typographers-quotes@$(node -p "require('./packages/typographers-quotes/package.json').version")" \
+            --title "typographers-quotes@$(node -p "require('./packages/typographers-quotes/package.json').version")" \
+            --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: packages/typographers-quotes/dist/
+      - run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          npm publish --access public
+        working-directory: packages/typographers-quotes
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

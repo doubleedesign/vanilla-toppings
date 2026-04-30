@@ -1,0 +1,57 @@
+name: Release resize-handle
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'packages/resize-handle/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+        working-directory: packages/resize-handle
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: packages/resize-handle/dist/
+
+  publish-github:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          gh release create "resize-handle@$(node -p "require('./packages/resize-handle/package.json').version")" \
+            --title "resize-handle@$(node -p "require('./packages/resize-handle/package.json').version")" \
+            --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-npm:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: packages/resize-handle/dist/
+      - run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+          npm publish --access public
+        working-directory: packages/resize-handle
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
