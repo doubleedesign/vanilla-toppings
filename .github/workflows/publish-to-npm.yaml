@@ -52,8 +52,16 @@ jobs:
 
             if [ "$changed" = "true" ]; then
               echo "Releasing $pkg_name..."
-              (cd "$pkg" && pnpm run release)
+              if ! (cd "$pkg" && pnpm run release); then
+                echo "::warning::Failed to release $pkg_name, continuing..."
+                failed_packages="$failed_packages $pkg_name"
+              fi
             else
               echo "Skipping $pkg_name (no changes since $LAST_TAG)"
             fi
           done
+          
+          if [ -n "$failed_packages" ]; then
+            echo "::error::The following packages failed to release:$failed_packages"
+            exit 1
+          fi
