@@ -1,0 +1,20 @@
+/**
+ * @license
+ * MyFonts Webfont Build ID 3867246, 2020-12-16T11:57:38-0500
+ *
+ * The fonts listed in this notice are subject to the End User License
+ * Agreement(s) entered into by the website owner. All other parties are
+ * explicitly restricted from using the Licensed Webfonts(s).
+ *
+ * You may obtain a valid license at the URLs below.
+ *
+ * Webfont: ITC Berkeley Old Style Pro Book Italic by ITC
+ * URL: https://www.myfonts.com/collections/itc-foundry
+
+ * Webfont: ITC Berkeley Old Style Pro Book by ITC
+ * URL: https://www.myfonts.com/collections/itc-foundry
+
+ * Webfont: ITC Berkeley Old Style Pro Bold by ITC
+ * URL: https://www.myfonts.com/collections/itc-foundry
+
+ * © 2026 MyFonts Inc. */
