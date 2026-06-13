@@ -1,5 +1,6 @@
 import { spyOn } from 'storybook/test';
-import { Title, Subtitle, Description, Primary, Controls, Stories, Source } from '@storybook/addon-docs/blocks';
+import { Title, Subtitle, Description, Primary, Controls, Stories } from '@storybook/addon-docs/blocks';
+import { Source } from './components/Source';
 import { themes } from 'storybook/theming';
 import { doubleeTheme } from '@doubleedesign/doublee-site-style';
 import './preview.css';
