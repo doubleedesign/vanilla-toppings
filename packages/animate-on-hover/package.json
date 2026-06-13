@@ -8,6 +8,12 @@
 		"url": "git+https://github.com/doubleedesign/vanilla-toppings"
 	},
 	"description": "A collection of SCSS mixins to add simple animated hover effects.",
+	"exports": {
+		".": {
+			"import": "./src/hover.scss",
+			"require": "./src/hover.scss"
+		}
+	},
 	"scripts": {
 		"build": "tsc",
 		"release": "npm run build && npx auto shipit"
@@ -18,7 +24,7 @@
 		"access": "public"
 	},
 	"files": [
-		"hover.scss",
+		"src/hover.scss",
 		"README.md",
 		"package.json"
 	],

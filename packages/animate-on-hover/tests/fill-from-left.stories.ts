@@ -51,7 +51,7 @@ const meta: Meta = {
 		},
 	},
 	decorators: [
-		withRuntimeScss('fill-demo.scss', 'fill-from-left')
+		withRuntimeScss('assets/fill-demo.scss', 'fill-from-left')
 	]
 };
 export default meta;

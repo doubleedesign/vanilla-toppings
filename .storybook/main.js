@@ -21,9 +21,13 @@ const config = {
 	framework: '@storybook/html-vite',
 	staticDirs: [
 		{
-			from: '../packages/animate-on-hover',
+			from: '../packages/animate-on-hover/tests/assets',
+			to: '/assets',
+		},
+		{
+			from: '../packages/animate-on-hover/src',
 			to: '/assets'
-		}
+		},
 	],
 };
 

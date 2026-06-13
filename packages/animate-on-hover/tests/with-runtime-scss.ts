@@ -1,7 +1,13 @@
 import type { PartialStoryFn, StoryContext } from 'storybook/internal/csf';
 import { compileString, type Importer } from 'sass';
 // @ts-expect-error TS2307: Cannot find module ../hover.scss?raw or its corresponding type declarations.
-import hoverSource from '../hover.scss?raw';
+import hoverSource from '../src/hover.scss?raw';
+
+// @ts-expect-error TS2339: Property glob does not exist on type ImportMeta
+const scssModules = import.meta.glob('../tests/assets/*.scss', {
+	query: '?raw',
+	import: 'default',
+});
 
 export const withRuntimeScss = (scssFile: string, mixin: string) => {
 	return (Story: PartialStoryFn, context: StoryContext) => {
@@ -28,9 +34,15 @@ class RuntimeScssLoader {
 	}
 
 	async getRawScss(): Promise<string> {
-		return await import(`./${this.scssFile}?raw`).then((module) => {
-			return module.default as string;
-		});
+		const key = Object.keys(scssModules).find((path) =>
+			path.endsWith(`/${this.scssFile}`)
+		);
+
+		if (!key) {
+			throw new Error(`SCSS file not found: ${this.scssFile}`);
+		}
+
+		return (await scssModules[key]()) as string;
 	}
 
 	setupImporter() {

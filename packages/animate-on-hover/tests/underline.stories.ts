@@ -61,7 +61,7 @@ const meta: Meta = {
 		},
 	},
 	decorators: [
-		withRuntimeScss('underline-demo.scss', 'underline-from-center')
+		withRuntimeScss('assets/underline-demo.scss', 'underline-from-center')
 	]
 };
 export default meta;
