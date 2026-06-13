@@ -1,0 +1,60 @@
+@mixin underline-from-center($colour: currentColor, $duration: 0.3s, $size: 1px) {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+	transition: text-decoration-color $duration ease-out;
+
+	&:before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		left: 50%;
+		right: 50%;
+		bottom: 0;
+		background: $colour;
+		height: $size;
+		transition-property: left, right;
+		transition-duration: $duration;
+		transition-timing-function: ease-out;
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		text-decoration-color: transparent;
+
+		&:before {
+			left: 0;
+			right: 0;
+		}
+	}
+}
+
+@mixin fill-from-left($colour: currentColor, $duration: 0.3s) {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+
+	&:before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		background: $colour;
+		transform: scaleX(0);
+		transform-origin: left center;
+		transition: transform $duration ease-out;
+		width: 100%;
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		&:before {
+			transform: scaleX(1);
+			transition-timing-function: ease-out;
+		}
+	}
+}
