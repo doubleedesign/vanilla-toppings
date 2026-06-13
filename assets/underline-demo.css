@@ -1,0 +1,38 @@
+.fancy-link-underline {
+  font-family: "Arial", sans-serif;
+  color: black;
+  text-decoration-color: slategrey;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  transition: text-decoration-color 0.3s ease-out;
+}
+.fancy-link-underline:before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  right: 50%;
+  bottom: 0;
+  background: currentColor;
+  height: 1px;
+  transition-property: left, right;
+  transition-duration: 0.3s;
+  transition-timing-function: ease-out;
+}
+.fancy-link-underline:hover, .fancy-link-underline:focus, .fancy-link-underline:active {
+  text-decoration-color: transparent;
+}
+.fancy-link-underline:hover:before, .fancy-link-underline:focus:before, .fancy-link-underline:active:before {
+  left: 0;
+  right: 0;
+}
+.fancy-link-underline:hover, .fancy-link-underline:focus, .fancy-link-underline:active {
+  color: black;
+}
+.fancy-link-underline--large {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/*# sourceMappingURL=underline-demo.css.map */
