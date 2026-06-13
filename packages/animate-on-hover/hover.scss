@@ -1,0 +1,32 @@
+/* Underline From Center */
+@mixin underline-from-center($colour: currentColor, $duration: 0.3s, $size: 1px) {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+	transition: text-decoration-color $duration ease-out;
+
+	&:before {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		left: 50%;
+		right: 50%;
+		bottom: 0;
+		background: $colour;
+		height: $size;
+		transition-property: left, right;
+		transition-duration: $duration;
+		transition-timing-function: ease-out;
+	}
+
+	&:hover,
+	&:focus,
+	&:active {
+		text-decoration-color: transparent;
+
+		&:before {
+			left: 0;
+			right: 0;
+		}
+	}
+}
