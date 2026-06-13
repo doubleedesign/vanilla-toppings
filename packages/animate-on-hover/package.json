@@ -20,10 +20,9 @@
 	"files": [
 		"hover.scss",
 		"README.md",
-		"NOTICES.md",
 		"package.json"
 	],
-	"dependencies": {
+	"devDependencies": {
 		"sass": "^1.101.0"
 	}
 }
