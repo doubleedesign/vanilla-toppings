@@ -3,6 +3,8 @@ import { Title, Subtitle, Description, Primary, Controls, Stories, Source } from
 import { themes } from 'storybook/theming';
 import { doubleeTheme } from '@doubleedesign/doublee-site-style';
 import './preview.css';
+import Prism from 'prismjs';
+import { withScssSyntaxHighlighting } from "./decorators/with-scss-syntax-highlighting.tsx";
 
 const mergedTheme = {
 	...themes.light,
@@ -42,7 +44,9 @@ const preview = {
 			}
 		},
 	},
-
+	decorators: [
+		withScssSyntaxHighlighting
+	],
 };
 
 export default preview;
