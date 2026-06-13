@@ -22,7 +22,7 @@
 		"README.md",
 		"package.json"
 	],
-	"devDependencies": {
+	"dependencies": {
 		"sass": "^1.101.0"
 	}
 }
