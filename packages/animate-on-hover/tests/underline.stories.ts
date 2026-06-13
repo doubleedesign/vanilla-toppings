@@ -74,7 +74,7 @@ export const Basic: Story = {
 		container.id = 'underline-demo';
 
 		const example = document.createElement('a');
-		example.className = 'fancy-link';
+		example.className = 'fancy-link-underline';
 		example.href = '#';
 		example.textContent = 'Example link';
 		container.appendChild(example);
@@ -94,7 +94,7 @@ export const Large: Story = {
 		container.id = 'underline-demo';
 
 		const example = document.createElement('a');
-		example.className = 'fancy-link fancy-link--large';
+		example.className = 'fancy-link-underline fancy-link-underline--large';
 		example.href = '#';
 		example.textContent = 'Example linky link';
 		const caption = document.createElement('p');
