@@ -18,7 +18,13 @@ const config = {
 		'@whitespace/storybook-addon-html',
 		'@storybook/addon-vitest',
 	],
-	framework: '@storybook/html-vite'
+	framework: '@storybook/html-vite',
+	staticDirs: [
+		{
+			from: '../packages/animate-on-hover',
+			to: '/assets'
+		}
+	],
 };
 
 export default config;
